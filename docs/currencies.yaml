@@ -1,0 +1,237 @@
+openapi: 3.0.0
+info:
+  title: Спецификация API для тестового задания Currencies
+  version: '1'
+servers:
+  - url: 'http://0.0.0.0:8888/api/v1'
+    description: Root url
+paths:
+  /user/register/:
+    post:
+      summary: Регистрация и активация пользователя
+      tags:
+        - Users
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/register'
+      responses:
+        '201':
+          $ref: '#/components/responses/201'
+        '400':
+          $ref: '#/components/responses/400'
+  /user/login/:
+    post:
+      tags:
+        - Users
+      summary: Получение токена аутентификации по email и password
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/login'
+      responses:
+        '200':
+          $ref: '#/components/responses/200_refresh_access'
+        '400':
+          $ref: '#/components/responses/400'
+  /rates/:
+    get:
+      tags:
+        - Rates
+      summary: Получение последних загруженных котировок
+      security:
+        - JWTAuth: []
+      parameters:
+        - in: query
+          name: order_by
+          schema:
+            description: 'Пункт раздела "Будет плюсом"'
+            type: string
+            enum: ['value', '-value']
+      responses:
+        '200':
+          $ref: '#/components/responses/200_rates'
+        '400':
+          $ref: '#/components/responses/400'
+  /currency/user_currency/:
+    post:
+      tags:
+        - Currency
+      summary: >-
+        Добавление котируемой валюты в список отслеживаемых с установкой
+        порогового значения
+      security:
+        - JWTAuth: []
+      requestBody:
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/user_currency_add'
+      responses:
+        '201':
+          $ref: '#/components/responses/201'
+        '400':
+          $ref: '#/components/responses/400'
+  /currency/{id}/analytics/:
+    get:
+      tags:
+        - Currency
+      summary: Получение аналитических данных по котирумой валюте за период
+      parameters:
+        - name: id
+          in: path
+          required: true
+          schema:
+            type: integer
+        - name: threshold
+          in: query
+          schema:
+            type: number
+          example: 100
+        - in: query
+          name: date_from
+          schema:
+            type: string
+            format: date
+          example: 2007-03-09
+        - in: query
+          name: date_to
+          schema:
+            type: string
+            format: date
+          example: 2007-03-09
+      responses:
+        '200':
+          $ref: '#/components/responses/200_analytics'
+        '400':
+          $ref: '#/components/responses/400'
+components:
+  securitySchemes:
+    JWTAuth:
+      type: http
+      scheme: bearer
+      bearerFormat: JWT
+  schemas:
+    register:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: example@example.com
+        password:
+          type: string
+          example: 12345678
+    login:
+      type: object
+      properties:
+        email:
+          type: string
+          format: email
+          example: example@example.com
+        password:
+          type: string
+          example: 12345678
+    user_currency_add:
+      type: object
+      properties:
+        currency:
+          type: integer
+          example: 1
+        threshold:
+          type: number
+          example: 100
+    rates_object:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        date:
+          type: string
+          format: datetime
+        charcode:
+          type: string
+          example: USD
+        value:
+          type: number
+          example: 30.9999
+    analytics_object:
+      type: object
+      properties:
+        id:
+          type: integer
+          example: 1
+        date:
+          type: string
+          format: datetime
+        charcode:
+          type: string
+          example: USD
+        value:
+          type: number
+          example: 30.9999
+        is_threshold_exceeded:
+          description: 'Пункт раздела "Обязательные"'
+          type: boolean
+          example: true
+        threshold_match_type:
+          description: 'Пункт раздела "Будет плюсом"'
+          type: string
+          enum: ['less', 'equal', 'exceeded']
+        is_min_value:
+          description: 'Пункт раздела "Будет плюсом"'
+          type: boolean
+          example: false
+        is_max_value:
+          description: 'Пункт раздела "Будет плюсом"'
+          type: boolean
+          example: false
+        percentage_ratio:
+          description: 'Пункт раздела "Будет плюсом"'
+          type: number
+          example: 90.99%
+  responses:
+    '200':
+      description: OK
+    '201':
+      description: Created
+    '400':
+      description: Provided data is invalid
+    '401':
+      description: Authentication credentials are invalid or were not provided
+    '404':
+      description: Not found
+    '405':
+      description: Method not allowed
+    200_refresh_access:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: object
+            properties:
+              refresh:
+                type: string
+                format: base64
+              access:
+                type: string
+                format: base64
+    200_rates:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/rates_object'
+    200_analytics:
+      description: OK
+      content:
+        application/json:
+          schema:
+            type: array
+            items:
+              $ref: '#/components/schemas/analytics_object'
