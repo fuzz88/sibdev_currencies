@@ -13,6 +13,8 @@ services:
 
   redis:
     image: redis:6-alpine
+    healthcheck:
+      test: [ "CMD", "redis-cli", "--raw", "incr", "ping" ]
 
   web:
     image: currencies-web:latest
@@ -26,4 +28,6 @@ services:
         - "8000:8000"
     depends_on:
       postgres:
+        condition: service_healthy
+      redis:
         condition: service_healthy
