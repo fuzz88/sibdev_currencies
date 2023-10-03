@@ -20,7 +20,7 @@
 [container] $ ./manage createsuperuser
 ```
 ---
-### Day2: setting jwt-auth and test-suite.
+### Day2: setting jwt-auth, bootsrapping routing and test-suite.
 ---
 ```
 ```
