@@ -10,9 +10,13 @@
 
 [.] $ pipenv install --dev && pipenv shell
 
-
 # run development environment
 
 [.] $ docker compose up --build -d --remove-orphans
+
+# create superuser inside container
+
+[.] $ docker compose exec web bash
+[container] $ ./manage createsuperuser
 ```
 ---

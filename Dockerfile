@@ -39,21 +39,23 @@ COPY requirements.txt /
 
 RUN pip install --no-cache-dir -r requirements.txt
 
+USER nobody
+
 WORKDIR /src
 COPY src /src
 
 ENV NO_CACHE=On
 # RUN ./manage.py compilemessages
-# RUN ./manage.py collectstatic --noinput
+RUN ./manage.py collectstatic --noinput
 ENV NO_CACHE=Off
 
-USER nobody
 
 
 FROM base as web
 # HEALTHCHECK CMD wget -q -O /dev/null http://localhost:8000/api/v2/healthchecks/db/ --header "Host: app.tough-dev.school" || exit 1
+# CMD ./manage.py migrate && uwsgi --master --http :8000 --module app.wsgi --workers 2 --threads 2 --harakiri 25 --max-requests 1000 --log-x-forwarded-for
 HEALTHCHECK CMD wget -q -O /dev/null http://localhost:8000/healthchecks/status || exit 1
-CMD ./manage.py migrate && uwsgi --master --http :8000 --module app.wsgi --workers 2 --threads 2 --harakiri 25 --max-requests 1000 --log-x-forwarded-for
+CMD ./manage.py migrate && ./manage.py runserver 0.0.0.0:8000
 
 
 FROM base as worker
