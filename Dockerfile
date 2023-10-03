@@ -1,7 +1,6 @@
 # ref: https://raw.githubusercontent.com/tough-dev-school/education-backend/master/Dockerfile
 
-ARG PYTHON_VERSION
-FROM python:${PYTHON_VERSION}-slim-bullseye as base
+FROM python:3.11-slim-bullseye as base
 
 LABEL maintainer="ivan@oschepkov.ru"
 
@@ -40,7 +39,6 @@ RUN pip install --no-cache-dir -r requirements.txt
 RUN apt-get remove -y build-essential
 RUN apt-get autoremove -y
 
-USER nobody
 
 WORKDIR /src
 COPY src /src
@@ -48,6 +46,7 @@ COPY src /src
 ENV NO_CACHE=On
 RUN ./manage.py collectstatic --noinput
 ENV NO_CACHE=Off
+USER nobody
 
 
 FROM base as web-with-static
