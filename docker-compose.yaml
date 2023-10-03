@@ -1,4 +1,29 @@
 version: "3"
 services:
+  postgres:
+    image: postgres:15-alpine
+    environment:
+      - POSTGRES_PASSWORD=secret
+      - POSTGRES_DB=currencies
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
   redis:
     image: redis:6-alpine
+
+  web:
+    image: currencies-web:latest
+    # restart: always
+    build:
+      context: .
+      target: web
+      args:
+        - "PYTHON_VERSION=3.11"
+    ports:
+        - "8000:8000"
+    depends_on:
+      postgres:
+        condition: service_healthy
