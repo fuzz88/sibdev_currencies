@@ -2,7 +2,7 @@
 ![trends](docs/trend.jpg)
 
 ---
-### Day1: bootstrapping django, docker-composing environment, customizing jwt-auth and User model.
+### Day1: bootstrapping django, docker-composing environment.
 ---
 ```
 # install development dependencies and obtain the shell with python venv. 
@@ -20,3 +20,7 @@
 [container] $ ./manage createsuperuser
 ```
 ---
+### Day2: setting jwt-auth and test-suite.
+---
+```
+```
