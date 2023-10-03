@@ -20,7 +20,7 @@
 [container] $ ./manage createsuperuser
 ```
 ---
-### Day2: setting jwt-auth, bootsrapping models, routing and test-suite.
+### Day2: setting jwt-auth, bootstrapping models, routing and test-suite.
 ---
 - [ ] email-password jwt-based auth backend.
 - [ ] models
