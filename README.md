@@ -1,6 +1,7 @@
-# Currencies
+## Currencies
+![trends](docs/trend.jpg)
 
-
+---
 ### Day1: bootstrapping django, docker-composing environment, customizing jwt-auth and User model.
 ---
 ```
@@ -14,3 +15,4 @@
 
 [.] $ docker compose up --build -d --remove-orphans
 ```
+---
