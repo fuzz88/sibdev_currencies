@@ -1,10 +1,9 @@
-# https://raw.githubusercontent.com/tough-dev-school/education-backend/master/Dockerfile
+# ref: https://raw.githubusercontent.com/tough-dev-school/education-backend/master/Dockerfile
 
 ARG PYTHON_VERSION
 FROM python:${PYTHON_VERSION}-slim-bullseye as base
 
 LABEL maintainer="ivan@oschepkov.ru"
-# originally by fedor@borshev.com
 
 ENV PYTHONUNBUFFERED 1
 ENV DEBIAN_FRONTEND noninteractive
@@ -17,14 +16,13 @@ ENV _WAITFOR_VERSION 2.2.3
 
 RUN echo deb http://deb.debian.org/debian buster contrib non-free > /etc/apt/sources.list.d/debian-contrib.list \
   && apt-get update \
-  && apt-get --no-install-recommends install -y gettext locales-all wget imagemagick tzdata git netcat \
+  && apt-get --no-install-recommends install -y wget tzdata netcat \
   && rm -rf /var/lib/apt/lists/*
 
-RUN apt-get update && apt-get --no-install-recommends install -y build-essential libxml2-dev libxslt1-dev \
-  && apt-get --no-install-recommends install -y libjpeg62-turbo-dev libjpeg-dev libfreetype6-dev libtiff5-dev liblcms2-dev libwebp-dev tk8.6-dev \
-  && apt-get --no-install-recommends install -y libffi-dev libcgraph6 libgraphviz-dev libmagic-dev \
+RUN apt-get update && apt-get --no-install-recommends install -y build-essential \
   && rm -rf /var/lib/apt/lists/*
 
+# okay, mb will use later
 RUN wget -O /usr/local/bin/wait-for https://github.com/eficode/wait-for/releases/download/v${_WAITFOR_VERSION}/wait-for \
   && chmod +x /usr/local/bin/wait-for
 
@@ -39,24 +37,27 @@ COPY requirements.txt /
 
 RUN pip install --no-cache-dir -r requirements.txt
 
+RUN apt-get remove -y build-essential
+RUN apt-get autoremove -y
+
 USER nobody
 
 WORKDIR /src
 COPY src /src
 
 ENV NO_CACHE=On
-# RUN ./manage.py compilemessages
 RUN ./manage.py collectstatic --noinput
 ENV NO_CACHE=Off
 
 
-
-FROM base as web
-# HEALTHCHECK CMD wget -q -O /dev/null http://localhost:8000/api/v2/healthchecks/db/ --header "Host: app.tough-dev.school" || exit 1
-# CMD ./manage.py migrate && uwsgi --master --http :8000 --module app.wsgi --workers 2 --threads 2 --harakiri 25 --max-requests 1000 --log-x-forwarded-for
+FROM base as web-with-static
 HEALTHCHECK CMD wget -q -O /dev/null http://localhost:8000/healthchecks/status || exit 1
 CMD ./manage.py migrate && ./manage.py runserver 0.0.0.0:8000
 
+
+FROM base as web
+HEALTHCHECK CMD wget -q -O /dev/null http://localhost:8000/healthchecks/status || exit 1
+CMD ./manage.py migrate && uwsgi --master --http :8000 --module app.wsgi --workers 2 --threads 2 --harakiri 25 --max-requests 1000 --log-x-forwarded-for
 
 FROM base as worker
 HEALTHCHECK CMD celery -A ${CELERY_APP} inspect ping -d $QUEUE@$HOSTNAME
