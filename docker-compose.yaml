@@ -22,7 +22,7 @@ services:
     # restart: always
     build:
       context: .
-      target: web
+      target: web-with-static
       args:
         - "PYTHON_VERSION=3.11"
     ports:
