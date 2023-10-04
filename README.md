@@ -22,7 +22,7 @@
 ---
 ### [04.10.23] Day2: setting jwt-auth up.
 ---
-- [ ] email-password jwt-based auth backend
+- [x] email-password jwt-based auth backend
 ---
 ### [05.10.23] Day3: bootstrapping models, routing and test-suite.
 ---
