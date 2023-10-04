@@ -2,7 +2,7 @@
 ![trends](docs/trend.jpg)
 
 ---
-### Day1: bootstrapping django, docker-composing environment.
+### [03.10.23] Day1: bootstrapping django, docker-composing environment.
 ---
 ```
 # install development dependencies and obtain the shell with python venv. 
