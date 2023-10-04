@@ -29,10 +29,10 @@
 - [ ] celery
 - [ ] registration
 ---
-### [06.10.23] Day3-turbo: bootstrapping models, routing and test-suite.
+### [06.10.23] Day4: bootstrapping models, routing and test-suite.
 ---
 - [ ] models
 - [ ] routing
 - [ ] tests
 ---
-### [10.10.23] Day4: self-review.
+### [10.10.23] Day5: self-review.
