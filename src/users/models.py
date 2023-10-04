@@ -3,6 +3,6 @@ from django.db import models
 
 
 class User(AbstractUser):
-    USERNAME_FIELD = 'email'
+    USERNAME_FIELD = "email"
     email = models.EmailField(unique=True, blank=False)
-    REQUIRED_FIELDS = []
+    REQUIRED_FIELDS = ["username"]
