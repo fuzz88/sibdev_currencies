@@ -24,15 +24,15 @@
 ---
 - [x] email-password jwt-based auth backend
 ---
-### [05.10.23] Day3: firing celery up, implementing registration with email verification.
+### [06.10.23] Day3: firing celery up, implementing registration with email verification.
 ---
 - [ ] celery
 - [ ] registration
 ---
-### [06.10.23] Day4: bootstrapping models, routing and test-suite.
+### [07.10.23] Day4: bootstrapping models, routing and test-suite.
 ---
 - [ ] models
 - [ ] routing
 - [ ] tests
 ---
-### [10.10.23] Day5: self-review.
+### [09.10.23] Day5: self-review.
