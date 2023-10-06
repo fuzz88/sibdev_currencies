@@ -11,14 +11,20 @@ def get_unsynced_currencies_data(data_source: DataSource):
     """
     Обновляем данные валют по дням, которых еще нет в базе данных.
     """
-    unsynced_dates = set([date.today() - timedelta(days=n) for n in range(31)]) - set(
-        [
-            CurrencyRate.objects.filter(
-                date__gte=date.today() - timedelta(days=30), char_code="GBP"
-            ).values_list("date")
-        ]  # так как данные получаем пачкой, то можно сделать выборку дат по одной валюте из источника данных.
+    past_30days_dates = set([date.today() - timedelta(days=n) for n in range(31)])
+
+    already_done = set(
+        CurrencyRate.objects.filter(
+            date__gte=date.today() - timedelta(days=30),
+            char_code="GBP",  # можем использовать дату по одной валюте, так как из внешнего апи получаем сразу пачкой валют.
+        )
+        .distinct()  # debug. убрать
+        .values_list("date", flat=True)
     )
-    print(f"unsynced_dates count: {len(unsynced_dates)}")
+    unsynced_dates = past_30days_dates.difference(already_done)
+    # print(f"past_30days: {past_30days_dates}")
+    # print(f"already done: {already_done}")
+    # print(f"unsynced_dates: {unsynced_dates}")
     return data_source.get_updates(unsynced_dates)
 
 
@@ -77,4 +83,3 @@ def task_update_currencies_db(self):
         #   1. use values from next date values "previous_value" field.
         #   2. retry task in 10 minutes
         print(f"{len(errors)} errors: {errors}\n retry in 10 minutes?")
-
