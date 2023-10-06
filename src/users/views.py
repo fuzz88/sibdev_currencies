@@ -29,7 +29,7 @@ class UserRegistration(View):
             return render(
                 request, "after-registration.html", {"verification_code": code}
             )
-        return redirect("https://www.stanfordrejects.com")
+        return redirect("https://www.berkeley.edu/")
 
     def get(self, request, *args, **kwargs):
         return render(request, "registration.html", {"form": UserRegistrationForm})
