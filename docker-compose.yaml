@@ -25,6 +25,51 @@ services:
       target: web-with-static
     ports:
       - "8000:8000"
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  worker:
+    image: currencies-worker:latest
+    # restart: always
+    build:
+      context: .
+      target: worker
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  scheduler:
+    image: currencies-scheduler:latest
+    # restart: always
+    build:
+      context: .
+      target: scheduler
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+    depends_on:
+      postgres:
+        condition: service_healthy
+      redis:
+        condition: service_healthy
+
+  flower:
+    image: currencies-flower:latest
+    build:
+      context: .
+      target: flower
+    environment:
+      - CELERY_BROKER_URL=redis://redis:6379/0
+    ports:
+      - "5555:5555"
     depends_on:
       postgres:
         condition: service_healthy

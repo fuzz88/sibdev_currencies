@@ -7,7 +7,6 @@ LABEL maintainer="ivan@oschepkov.ru"
 ENV PYTHONUNBUFFERED 1
 ENV DEBIAN_FRONTEND noninteractive
 
-ENV STATIC_ROOT /var/lib/django-static
 ENV CELERY_APP=app.celery
 
 ENV _UWSGI_VERSION 2.0.21
@@ -53,15 +52,16 @@ FROM base as web-with-static
 HEALTHCHECK CMD wget -q -O /dev/null http://localhost:8000/healthchecks/status || exit 1
 CMD ./manage.py migrate && ./manage.py runserver 0.0.0.0:8000
 
-
 FROM base as web
 HEALTHCHECK CMD wget -q -O /dev/null http://localhost:8000/healthchecks/status || exit 1
 CMD ./manage.py migrate && uwsgi --master --http :8000 --module app.wsgi --workers 2 --threads 2 --harakiri 25 --max-requests 1000 --log-x-forwarded-for
 
 FROM base as worker
-HEALTHCHECK CMD celery -A ${CELERY_APP} inspect ping -d $QUEUE@$HOSTNAME
-CMD celery -A ${CELERY_APP} worker -Q $QUEUE -c ${CONCURENCY:-2} -n "${QUEUE}@%h" --max-tasks-per-child ${MAX_REQUESTS_PER_CHILD:-50} --time-limit ${TIME_LIMIT:-900} --soft-time-limit ${SOFT_TIME_LIMIT:-45}
+HEALTHCHECK CMD celery -A ${CELERY_APP} inspect ping
+CMD celery -A ${CELERY_APP} worker -E -c ${CONCURENCY:-2} --max-tasks-per-child ${MAX_REQUESTS_PER_CHILD:-50} --time-limit ${TIME_LIMIT:-900} --soft-time-limit ${SOFT_TIME_LIMIT:-45}
 
+FROM base as flower
+CMD celery -A ${CELERY_APP} flower
 
 FROM base as scheduler
 ENV SCHEDULER_DB_PATH=/var/db/scheduler

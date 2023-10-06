@@ -6,12 +6,18 @@ name = "pypi"
 [packages]
 django = "*"
 djangorestframework = "*"
-celery = "*"
 djangorestframework-simplejwt = "*"
 psycopg2-binary = "*"
+django-environ = "*"
+celery = {extras = ["redis"], version = "*"}
+flower = "*"
+requests = "*"
 
 [dev-packages]
 pytest = "*"
+black = "*"
+isort = "*"
+autoflake = "*"
 
 [requires]
 python_version = "3.11"
