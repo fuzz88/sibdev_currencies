@@ -29,7 +29,7 @@
 - [x] celery
 - [x] registration
 ---
-### [07.10.23] Day4: bootstrapping models, routing and test-suite.
+### [*] Day4: models, routing and test-suite.
 ---
 - [ ] models
 - [ ] routing

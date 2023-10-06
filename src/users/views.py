@@ -1,9 +1,9 @@
-from django.db import IntegrityError
 import jwt
+from django.contrib.auth.hashers import make_password
+from django.db import IntegrityError
 from django.http import HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect, render
 from django.views import View
-from django.contrib.auth.hashers import make_password
 
 from app.settings import SECRET_KEY
 from users.forms import UserRegistrationForm
