@@ -1,0 +1,20 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <title>User Registration</title>
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/@picocss/pico@1/css/pico.min.css">
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+</head>
+
+<body>
+    <main class="container">
+        <h1>Your confirmation link:</h1>
+        <h3><a href="{% url 'verification' verification_code %}">LINK</a></h3>
+        <h5>Let's pretend you have received it by email.</h5>
+
+    </main>
+</body>
+
+</html>
