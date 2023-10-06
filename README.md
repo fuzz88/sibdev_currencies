@@ -27,7 +27,7 @@
 ### [06.10.23] Day3: firing celery up, implementing registration with email verification.
 ---
 - [x] celery
-- [ ] registration
+- [x] registration
 ---
 ### [07.10.23] Day4: bootstrapping models, routing and test-suite.
 ---
