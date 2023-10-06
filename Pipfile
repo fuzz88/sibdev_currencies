@@ -11,7 +11,7 @@ psycopg2-binary = "*"
 django-environ = "*"
 celery = {extras = ["redis"], version = "*"}
 flower = "*"
-requests = "*"
+httpx = "*"
 
 [dev-packages]
 pytest = "*"
