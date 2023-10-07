@@ -40,7 +40,7 @@ def task_update_currencies_db(self):
     errors = []
     for ds in data_sources:
         try:
-            # каждый элемент в списке results соотвествует одной дате
+            # каждый элемент в списке results соответствует одной дате
             results = get_unsynced_currencies_data(ds)
             print(f"got {len(results)} results.")
 
