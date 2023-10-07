@@ -6,7 +6,9 @@ from django.core.validators import validate_email
 from django.db import IntegrityError
 from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect, render
+from django.utils.decorators import method_decorator
 from django.views import View
+from django.views.decorators.csrf import csrf_exempt
 
 from app.settings import SECRET_KEY
 from users.forms import UserRegistrationForm
@@ -55,6 +57,7 @@ class EmailVerification(View):
             return HttpResponse("Registration Failed!")
 
 
+@method_decorator(csrf_exempt, name="dispatch")
 class UserRegistrationByJSON(View):
     def post(self, request: HttpRequest, *args, **kwargs):
         if request.content_type == "application/json":
@@ -62,11 +65,12 @@ class UserRegistrationByJSON(View):
                 data = json.loads(request.body)
                 validate_email(data["email"])
                 User(
-                    # username=data["email"], # TODO: remove.
+                    username=data["email"],  # TODO: remove, maybe.
                     email=data["email"],
                     password=make_password(data["password"]),
                 ).save()
+                return HttpResponse(status=200)
             except:
-                return HttpResponseBadRequest("Provided data is invalid")
+                return HttpResponseBadRequest(f"Provided data is invalid")
         else:
-            return HttpResponseBadRequest("content-type mismatch")
+            return HttpResponseBadRequest("Content-type mismatch")
