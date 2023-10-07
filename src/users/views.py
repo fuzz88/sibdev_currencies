@@ -17,6 +17,11 @@ from users.models import User
 
 
 class UserRegistration(View):
+    """
+    АПИ нулевой версии. Форма на фронте, пароль в коде верификации в открытом виде.
+    LOL.
+    """
+
     def post(self, request, *args, **kwargs):
         form = UserRegistrationForm(request.POST)
         if form.is_valid():
@@ -42,6 +47,11 @@ class UserRegistration(View):
 
 
 class EmailVerification(View):
+    """
+    АПИ нулевой версии. Верификация email. Без отправки email.
+    LOL.
+    """
+
     def get(self, request, code=None, *args, **kwargs):
         try:
             decoded = jwt.decode(code, key=SECRET_KEY, algorithms="HS256")
@@ -60,6 +70,10 @@ class EmailVerification(View):
 
 @method_decorator(csrf_exempt, name="dispatch")
 class UserRegistrationByJSON(View):
+    """
+    АПИ первой версии версии.
+    """
+
     def post(self, request: HttpRequest, *args, **kwargs):
         if request.content_type == "application/json":
             try:
@@ -78,4 +92,10 @@ class UserRegistrationByJSON(View):
 
 
 class CustomTokenObtainPairView(TokenObtainPairView):
+    """
+    Прокидываем свой сериализатор в SimpleJWT,
+    так как родной возращает 401 код в случае неправильных логина и пароля,
+    а мы, по спецификации, хотим 400.
+    """
+
     _serializer_class = "users.serializers.CustomTokenObtainPairSerializer"
