@@ -39,7 +39,6 @@ def task_update_currencies_db(self):
         try:
             # каждый элемент в списке results соответствует одной дате
             results: list = get_unsynced_currencies_data(ds)
-            print(f"got {len(results)} results.")
 
             for result in results:
                 # результатом может быть ошибка
@@ -82,4 +81,6 @@ def task_update_currencies_db(self):
         # error recovery plans:
         #   1. use values from next date values "previous_value" field.
         #   2. retry task in 10 minutes
-        print(f"{len(errors)} errors: {errors}\n retry in 10 minutes? 120 minutes?")
+        logging.getLogger().error(
+            f"{len(errors)} errors: {errors}\n retry in 10 minutes? 120 minutes?"
+        )
