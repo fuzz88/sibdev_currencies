@@ -1,9 +1,8 @@
 from django.contrib import admin
 from django.urls import include, path
 
-
 from healthchecks.views import Status
-from users.views import UserRegistrationByJSON, CustomTokenObtainPairView
+from users.views import CustomTokenObtainPairView, UserRegistrationByJSON
 
 service_urls = [
     path("admin/", admin.site.urls),

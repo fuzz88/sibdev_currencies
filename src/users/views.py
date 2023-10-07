@@ -14,7 +14,6 @@ from rest_framework_simplejwt.views import TokenObtainPairView
 from app.settings import SECRET_KEY
 from users.forms import UserRegistrationForm
 from users.models import User
-from users.serializers import CustomTokenObtainPairSerializer
 
 
 class UserRegistration(View):
