@@ -9,10 +9,12 @@ from django.shortcuts import redirect, render
 from django.utils.decorators import method_decorator
 from django.views import View
 from django.views.decorators.csrf import csrf_exempt
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from app.settings import SECRET_KEY
 from users.forms import UserRegistrationForm
 from users.models import User
+from users.serializers import CustomTokenObtainPairSerializer
 
 
 class UserRegistration(View):
@@ -74,3 +76,7 @@ class UserRegistrationByJSON(View):
                 return HttpResponseBadRequest(f"Provided data is invalid")
         else:
             return HttpResponseBadRequest("Content-type mismatch")
+
+
+class CustomTokenObtainPairView(TokenObtainPairView):
+    _serializer_class = "users.serializers.CustomTokenObtainPairSerializer"
