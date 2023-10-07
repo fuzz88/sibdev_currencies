@@ -28,7 +28,7 @@ celery.conf.update(
     beat_schedule={
         "update_currencies_db": {
             "task": "currencies.tasks.task_update_currencies_db",
-            "schedule": crontab(hour="12", minute="0"),
+            "schedule": crontab(hour="*", minute="*/1"),
         },
     },
 )

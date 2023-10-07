@@ -11,14 +11,25 @@ class CBRFDaily(DataSource):
     @staticmethod
     async def fetch_archive(date: tuple) -> dict:
         year, month, day = date
-        async with httpx.AsyncClient() as client:
-            resp = await client.get(
-                f"https://www.cbr-xml-daily.ru/archive/{year}/{month:02}/{day:02}/daily_json.js"
-            )
-            return resp.json()
+
+        async def fetch(retry_count=3):
+            try:
+                url = f"https://www.cbr-xml-daily.ru/archive/{year}/{month:02}/{day:02}/daily_json.js"
+                async with httpx.AsyncClient() as client:
+                    resp = await client.get(url)
+                    if resp.status_code != 200:
+                        raise Exception(f"Retry. {resp.status_code} {url}")
+                    return resp.json()
+            except Exception as e:
+                await asyncio.sleep((3 - retry_count) * 1.0)  # progressive delay
+                if retry_count == 0:
+                    return {"error": resp.status_code}
+                return await fetch(retry_count - 1)
+
+        return await fetch()
 
     @staticmethod
-    def get_updates(dates: Set[date]):
+    def get_updates(dates: Set[date]) -> list[dict]:
         """
         asyncroniously fetch archive for past 30 days and return results when all ready.
         """

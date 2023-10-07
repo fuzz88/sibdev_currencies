@@ -7,7 +7,7 @@ from currencies.data_sources.CBRFDaily import CBRFDaily
 from currencies.models import CurrencyRate
 
 
-def get_unsynced_currencies_data(data_source: DataSource):
+def get_unsynced_currencies_data(data_source: DataSource) -> list[dict]:
     """
     Обновляем данные валют по дням, которых еще нет в базе данных.
     """
@@ -28,20 +28,17 @@ def get_unsynced_currencies_data(data_source: DataSource):
     return data_source.get_updates(unsynced_dates)
 
 
-data_sources = [CBRFDaily]  #  список источников данных
-
-
 @celery.task(bind=True)
 def task_update_currencies_db(self):
     """
     Пробегаемся по списку источников данных, у каждого запрашиваем данные.
-    Каждый источник умеет
     """
+    data_sources = [CBRFDaily]  #  список источников данных
     errors = []
     for ds in data_sources:
         try:
             # каждый элемент в списке results соответствует одной дате
-            results = get_unsynced_currencies_data(ds)
+            results: list = get_unsynced_currencies_data(ds)
             print(f"got {len(results)} results.")
 
             for result in results:
@@ -85,4 +82,4 @@ def task_update_currencies_db(self):
         # error recovery plans:
         #   1. use values from next date values "previous_value" field.
         #   2. retry task in 10 minutes
-        print(f"{len(errors)} errors: {errors}\n retry in 10 minutes?")
+        print(f"{len(errors)} errors: {errors}\n retry in 10 minutes? 120 minutes?")
