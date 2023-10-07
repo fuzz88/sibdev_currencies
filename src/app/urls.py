@@ -1,15 +1,32 @@
 from django.contrib import admin
-from django.urls import path
-from rest_framework_simplejwt.views import TokenObtainPairView, TokenRefreshView
+from django.urls import include, path
+from rest_framework_simplejwt.views import TokenObtainPairView
 
 from healthchecks.views import Status
-from users.views import EmailVerification, UserRegistration
+from users.views import UserRegistrationByJSON
 
-urlpatterns = [
+service_urls = [
     path("admin/", admin.site.urls),
     path("healthchecks/status/", Status.as_view()),
-    path("api/token/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
-    path("api/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
-    path("registration/", UserRegistration.as_view()),
-    path("verification/<str:code>/", EmailVerification.as_view(), name="verification"),
+]
+
+# v0_API_urls = [
+#     path("user/registration/", UserRegistration.as_view(), name="registration"),
+#     path(
+#         "user/verification/<str:code>/",
+#         EmailVerification.as_view(),
+#         name="verification",
+#     ),
+# ]
+
+v1_API_urls = [
+    path("user/register/", UserRegistrationByJSON.as_view(), name="create_user"),
+    path("user/login/", TokenObtainPairView.as_view(), name="token_obtain_pair"),
+    # path("api/v1/user/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+]
+
+urlpatterns = [
+    # path("api/v0/", include(v0_API_urls)),
+    path("api/v1/", include(v1_API_urls)),
+    path("", include(service_urls)),
 ]

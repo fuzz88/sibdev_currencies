@@ -1,7 +1,10 @@
+import json
+
 import jwt
 from django.contrib.auth.hashers import make_password
+from django.core.validators import validate_email
 from django.db import IntegrityError
-from django.http import HttpResponse, HttpResponseBadRequest
+from django.http import HttpRequest, HttpResponse, HttpResponseBadRequest
 from django.shortcuts import redirect, render
 from django.views import View
 
@@ -50,3 +53,20 @@ class EmailVerification(View):
             return HttpResponse("Registration Successful!")
         except IntegrityError:
             return HttpResponse("Registration Failed!")
+
+
+class UserRegistrationByJSON(View):
+    def post(self, request: HttpRequest, *args, **kwargs):
+        if request.content_type == "application/json":
+            try:
+                data = json.loads(request.body)
+                validate_email(data["email"])
+                User(
+                    # username=data["email"], # TODO: remove.
+                    email=data["email"],
+                    password=make_password(data["password"]),
+                ).save()
+            except:
+                return HttpResponseBadRequest("Provided data is invalid")
+        else:
+            return HttpResponseBadRequest("content-type mismatch")

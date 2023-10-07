@@ -49,12 +49,12 @@ USER nobody
 
 
 FROM base as web-with-static
-HEALTHCHECK CMD wget -q -O /dev/null http://localhost:8000/healthchecks/status || exit 1
-CMD ./manage.py migrate && ./manage.py runserver 0.0.0.0:8000
+HEALTHCHECK CMD wget -q -O /dev/null http://localhost:8888/healthchecks/status || exit 1
+CMD ./manage.py migrate && ./manage.py runserver 0.0.0.0:8888
 
 FROM base as web
-HEALTHCHECK CMD wget -q -O /dev/null http://localhost:8000/healthchecks/status || exit 1
-CMD ./manage.py migrate && uwsgi --master --http :8000 --module app.wsgi --workers 2 --threads 2 --harakiri 25 --max-requests 1000 --log-x-forwarded-for
+HEALTHCHECK CMD wget -q -O /dev/null http://localhost:8888/healthchecks/status || exit 1
+CMD ./manage.py migrate && uwsgi --master --http :8888 --module app.wsgi --workers 2 --threads 2 --harakiri 25 --max-requests 1000 --log-x-forwarded-for
 
 FROM base as worker
 HEALTHCHECK CMD celery -A ${CELERY_APP} inspect ping

@@ -24,7 +24,7 @@ services:
       context: .
       target: web-with-static
     ports:
-      - "8000:8000"
+      - "8888:8888"
     environment:
       - CELERY_BROKER_URL=redis://redis:6379/0
     depends_on:
