@@ -16,10 +16,9 @@ def get_unsynced_currencies_data(data_source: DataSource) -> list[dict]:
     already_done = set(
         CurrencyRate.objects.filter(
             date__gte=date.today() - timedelta(days=30),
-            char_code="GBP",  # можем использовать дату по одной валюте, так как из внешнего апи получаем сразу пачкой валют.
         )
-        .distinct()  # debug. убрать
         .values_list("date", flat=True)
+        .distinct()
     )
     unsynced_dates = past_30days_dates.difference(already_done)
     # print(f"past_30days: {past_30days_dates}")
@@ -46,8 +45,11 @@ def task_update_currencies_db(self):
                 if error is None:
                     # ошибки нет, давайте парсить
                     date = result.get("Date")
+
                     valutes = result.get("Valute")
                     for valute in valutes.values():
+                        # основной dict с валютами. ключ повторяет char_code,
+                        # так что ключ не используем.
                         id = valute.get("ID")
                         num_code = valute.get("NumCode")
                         char_code = valute.get("CharCode")
@@ -55,6 +57,7 @@ def task_update_currencies_db(self):
                         value = valute.get("Value")
                         previous_value = valute.get("Previous")
                         nominal = valute.get("Nominal")
+
                         # отпарсили без ошибок, ок, сохраняем
                         CurrencyRate(
                             cbrf_id=id,
@@ -71,6 +74,8 @@ def task_update_currencies_db(self):
                     errors.append(error)
         except Exception as e:
             # если что-то поломалось на нашей стороне, то запишем в логи.
+            # например, формат данных изменился, у нас сломался парсинг.
+            # или мы потеряли коннект в бд.
 
             # ошибки транспорта мы обработали в месте его использования.
             logging.getLogger().exception(e)
