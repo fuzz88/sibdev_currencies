@@ -1,6 +1,7 @@
 from django.contrib import admin
 from django.urls import include, path
 
+from currencies.urls import rates_router
 from healthchecks.views import Status
 from users.views import CustomTokenObtainPairView, UserRegistrationByJSON
 
@@ -14,6 +15,7 @@ v1_API_urls = [
     path("user/register/", UserRegistrationByJSON.as_view(), name="create_user"),
     path("user/login/", CustomTokenObtainPairView.as_view(), name="token_obtain_pair"),
     # path("user/token/refresh/", TokenRefreshView.as_view(), name="token_refresh"),
+    path("", include(rates_router.urls)),
 ]
 
 urlpatterns = [
