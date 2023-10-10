@@ -32,7 +32,7 @@ class CBRFDaily(DataSource):
                     (CBRFDaily.RETRY_COUNT + 1 - retry_count) * 1.0
                 )  # progressive delay
                 if retry_count == 0:
-                    return {"error": resp.status_code}
+                    return {"error": (resp.status_code, date)}
                 return await fetch(retry_count - 1)
 
         return await fetch()
