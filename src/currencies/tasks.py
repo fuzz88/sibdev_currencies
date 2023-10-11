@@ -38,7 +38,12 @@ def task_update_currencies_db(self):
         try:
             # каждый элемент в списке results соответствует одной дате
             results: list = get_unsynced_currencies_data(ds)
+
+            # подтянем список известных нам валют в словарь
+            # используем его при парсинге, чтобы лишний раз не бегать в базу данных
+            # за айди объекта валюты при записи обновления её рэйта.
             currencies = dict(Currency.objects.all().values_list("char_code", "id"))
+
             for result in results:
                 # результатом может быть ошибка
                 error = result.get("error")
@@ -46,10 +51,18 @@ def task_update_currencies_db(self):
                     # ошибки нет, давайте парсить
                     date = result.get("Date")
 
+                    # основной словарь с валютами. такой вот примерно:
+                    # {
+                    #     "GBP": {
+                    #         "Value": 1.0,
+                    #         "CharCode": "GBP",
+                    #         ...
+                    #     }
+                    # }
+                    # ключ, как видим, можем не итерировать - он дублируется.
+
                     valutes = result.get("Valute")
                     for valute in valutes.values():
-                        # основной dict с валютами. ключ повторяет char_code,
-                        # так что ключ не используем.
                         id = valute.get("ID")
                         num_code = valute.get("NumCode")
                         char_code = valute.get("CharCode")
@@ -58,9 +71,13 @@ def task_update_currencies_db(self):
                         prev_value = valute.get("Previous")
                         nominal = valute.get("Nominal")
 
+                        # проверяем, известна ли нам была валюта в момент запуска таски
                         currency_object_id = currencies.get(char_code)
 
                         if currency_object_id is None:
+                            # нет, не известна. 
+                            # скорее всего, это первый запуск таски, т.н. "прогрев"
+                            # делаем запрос в б.д.
                             currency_object, _ = Currency.objects.get_or_create(
                                 cbrf_id=id,
                                 num_code=num_code,
