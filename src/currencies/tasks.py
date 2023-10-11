@@ -39,7 +39,7 @@ def task_update_currencies_db(self):
             # каждый элемент в списке results соответствует одной дате
             results: list = get_unsynced_currencies_data(ds)
 
-            # подтянем список известных нам валют в словарь
+            # подтянем список известных нам валют в словарь.
             # используем его при парсинге, чтобы лишний раз не бегать в базу данных
             # за айди объекта валюты при записи обновления её рэйта.
             currencies = dict(Currency.objects.all().values_list("char_code", "id"))
@@ -71,12 +71,14 @@ def task_update_currencies_db(self):
                         prev_value = valute.get("Previous")
                         nominal = valute.get("Nominal")
 
-                        # проверяем, известна ли нам была валюта в момент запуска таски
+                        # отпарсили без ошибок, ок.
+
+                        # проверяем есть ли валюта в нашем локальном кэше.
                         currency_object_id = currencies.get(char_code)
 
                         if currency_object_id is None:
-                            # нет, не известна.
-                            # скорее всего, это первый запуск таски, т.н. "прогрев"
+                            # в кэше нет.
+                            # скорее всего, это первый запуск таски, и кэш не прогрет.
                             # делаем запрос в б.д.
                             currency_object, _ = Currency.objects.get_or_create(
                                 cbrf_id=id,
@@ -86,22 +88,25 @@ def task_update_currencies_db(self):
                                 nominal=nominal,
                             )
                             currency_object_id = currency_object.id
-                        # отпарсили без ошибок, ок, сохраняем
+                        #  сохраняем.
                         CurrencyRate(
                             currency_id=currency_object_id,
                             value=value,
                             prev_value=prev_value,
-                            date=date.split("T")[0],  # отрезаем время
+                            date=date.split("T")[0],  # отрезаем время.
                         ).save()
                 else:
                     # если результатом запроса по дате вернулась ошибка,
+                    # сохраним её.
                     errors.append(error)
         except Exception as e:
             # если что-то поломалось на нашей стороне, то запишем в логи.
-            # например, формат данных изменился, у нас сломался парсинг.
+            # например, формат данных изменился, у нас сломался парсинг
             # или мы потеряли коннект в бд.
 
             # ошибки транспорта мы обработали в месте его использования.
+
+            # просто логируем.
             logging.getLogger().exception(e)
     if len(errors) != 0:
         # если ошибку возвращает внешнее апи, то делаем ретрай всей celery task

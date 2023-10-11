@@ -18,6 +18,7 @@ pytest = "*"
 black = "*"
 isort = "*"
 autoflake = "*"
+git-bars = "*"
 
 [requires]
 python_version = "3.11"
