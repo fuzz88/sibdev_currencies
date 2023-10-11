@@ -23,16 +23,16 @@ class UserRegistrationByJSON(View):
             try:
                 data = json.loads(request.body)
                 validate_email(data["email"])
-                User(
-                    username=data[
-                        "email"
-                    ],  # username is essential to edit User objects with default UserAdmin template
-                    email=data["email"],
-                    password=make_password(data["password"]),
-                ).save()
-                return HttpResponse(status=200)
             except:
                 return HttpResponseBadRequest(f"Provided data is invalid")
+            User(
+                username=data[
+                    "email"
+                ],  # username is essential to edit User objects with default UserAdmin template
+                email=data["email"],
+                password=make_password(data["password"]),
+            ).save()
+            return HttpResponse(status=200)
         else:
             return HttpResponseBadRequest("Content-type must be application/json")
 
