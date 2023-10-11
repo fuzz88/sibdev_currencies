@@ -12,12 +12,11 @@
 
 # run development environment
 
-[.] $ docker compose up --build -d --remove-orphans
+[.] $ make up
 
-# create superuser inside container
+# create superuser (after "make up" only)
 
-[.] $ docker compose exec web bash
-[container] $ ./manage createsuperuser
+[.] $ make superuser
 ```
 ---
 ### [04.10.23] Day2: setting jwt-auth up.
