@@ -22,3 +22,9 @@ class CurrencyThreshold(models.Model):
     user = models.ForeignKey(User, on_delete=models.CASCADE)
     currency = models.ForeignKey(Currency, on_delete=models.CASCADE)
     threshold_value = models.DecimalField(max_digits=12, decimal_places=4)
+
+    class Meta:
+        unique_together = (
+            "user",
+            "currency",
+        )

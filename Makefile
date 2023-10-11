@@ -11,3 +11,6 @@ down:
 
 psql:
 	docker compose exec -ti postgres bash -c "su -c psql postgres"
+
+superuser:
+	docker compose exec -ti web bash -c "./manage.py createsuperuser"

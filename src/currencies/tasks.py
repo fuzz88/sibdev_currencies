@@ -75,7 +75,7 @@ def task_update_currencies_db(self):
                         currency_object_id = currencies.get(char_code)
 
                         if currency_object_id is None:
-                            # нет, не известна. 
+                            # нет, не известна.
                             # скорее всего, это первый запуск таски, т.н. "прогрев"
                             # делаем запрос в б.д.
                             currency_object, _ = Currency.objects.get_or_create(
