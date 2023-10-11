@@ -29,10 +29,11 @@
 - [x] celery
 - [x] registration
 ---
-### [*] Day4: models, routing and test-suite.
+### [*] Day4: models, routing.
 ---
-- [ ] models
+- [x] models
 - [ ] routing
-- [ ] tests
+
 ---
 ### [10.10.23] Day5: self-review and tests.
+- [ ] tests
