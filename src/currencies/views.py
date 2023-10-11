@@ -43,6 +43,7 @@ class CurrencyRateViewSet(viewsets.ReadOnlyModelViewSet):
                     "date",
                     "currency__id",
                     "currency__char_code",
+                    "is_above_threshold",
                 ),
                 many=True,
             )
