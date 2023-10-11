@@ -1,15 +1,8 @@
-from rest_framework import serializers, viewsets
+from rest_framework import viewsets
 from rest_framework.response import Response
 
 from currencies.models import CurrencyRate, CurrencyThreshold
-
-
-class CurrencyRateSerializer(serializers.ModelSerializer):
-    charcode = serializers.CharField(source="char_code")
-
-    class Meta:
-        model = CurrencyRate
-        fields = ["id", "date", "charcode", "value"]
+from currencies.serializers import CurrencyRateSerializer, CurrencyThresholdSerializer
 
 
 class CurrencyRateViewSet(viewsets.ReadOnlyModelViewSet):
@@ -23,12 +16,6 @@ class CurrencyRateViewSet(viewsets.ReadOnlyModelViewSet):
             return Response(data=[])
 
 
-class CurrencyThresholdSerializer(serializers.ModelSerializer):
-    currency = serializers.IntegerField(source="id")
-    threshold = serializers.DecimalField(
-        source="threshold_value", max_digits=12, decimal_places=4
-    )
-
-    class Meta:
-        model = CurrencyThreshold
-        fields = ["currency", "threshold"]
+class CurrencyThresholdViewSet(viewsets.ModelViewSet):
+    queryset = CurrencyThreshold.objects.all()
+    serializer_class = CurrencyThresholdSerializer
