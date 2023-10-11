@@ -4,7 +4,7 @@ from datetime import date, timedelta
 from app.celery import celery
 from currencies.data_sources.base import DataSource
 from currencies.data_sources.CBRFDaily import CBRFDaily
-from currencies.models import CurrencyRate
+from currencies.models import Currency, CurrencyRate
 
 
 def get_unsynced_currencies_data(data_source: DataSource) -> list[dict]:
@@ -38,7 +38,7 @@ def task_update_currencies_db(self):
         try:
             # каждый элемент в списке results соответствует одной дате
             results: list = get_unsynced_currencies_data(ds)
-
+            currencies = dict(Currency.objects.all().values_list("char_code", "id"))
             for result in results:
                 # результатом может быть ошибка
                 error = result.get("error")
@@ -55,18 +55,25 @@ def task_update_currencies_db(self):
                         char_code = valute.get("CharCode")
                         name = valute.get("Name")
                         value = valute.get("Value")
-                        previous_value = valute.get("Previous")
+                        prev_value = valute.get("Previous")
                         nominal = valute.get("Nominal")
 
+                        currency_object_id = currencies.get(char_code)
+
+                        if currency_object_id is None:
+                            currency_object, _ = Currency.objects.get_or_create(
+                                cbrf_id=id,
+                                num_code=num_code,
+                                char_code=char_code,
+                                name=name,
+                                nominal=nominal,
+                            )
+                            currency_object_id = currency_object.id
                         # отпарсили без ошибок, ок, сохраняем
                         CurrencyRate(
-                            cbrf_id=id,
-                            num_code=num_code,
-                            char_code=char_code,
-                            name=name,
+                            currency_id=currency_object_id,
                             value=value,
-                            previous_value=previous_value,
-                            nominal=nominal,
+                            prev_value=prev_value,
                             date=date.split("T")[0],  # отрезаем время
                         ).save()
                 else:
