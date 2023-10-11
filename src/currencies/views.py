@@ -36,7 +36,14 @@ class CurrencyRateViewSet(viewsets.ReadOnlyModelViewSet):
                         default=Value(False),
                     )
                 )
-                .select_related("currency"),
+                .select_related("currency")
+                .values(
+                    "id",
+                    "value",
+                    "date",
+                    "currency__id",
+                    "currency__char_code",
+                ),
                 many=True,
             )
             return Response(serializer.data)

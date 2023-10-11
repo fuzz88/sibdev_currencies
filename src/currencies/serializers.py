@@ -4,7 +4,7 @@ from currencies.models import CurrencyRate, CurrencyThreshold
 
 
 class CurrencyRateSerializer(serializers.ModelSerializer):
-    charcode = serializers.CharField(source="currency.char_code")
+    charcode = serializers.CharField(source="currency__char_code")
     is_above_threshold = serializers.BooleanField(required=False)
 
     class Meta:
@@ -13,7 +13,7 @@ class CurrencyRateSerializer(serializers.ModelSerializer):
 
 
 class CurrencyThresholdSerializer(serializers.ModelSerializer):
-    currency = serializers.IntegerField(source="currency.id")
+    currency = serializers.IntegerField(source="currency_id")
     threshold = serializers.DecimalField(
         source="threshold_value", max_digits=12, decimal_places=4
     )
